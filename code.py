@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import math
+include <data.py>
 
 def p_ai_to_ai (ai):
     ai_ai = 0
@@ -39,7 +40,7 @@ def create_matrix(matrix):
                 transtion_matrix[i][j] =  p_ai_to_aj(matrix[i],matrix[j])
             # if i>j:
             #     transtion_matrix[i][j] =  p_aj_to_ai(matrix[i],matrix[j])
-
+    transtion_matrix = normalization(transtion_matrix)
     return transtion_matrix
 
 def create_trans_matrix(arr):
@@ -184,3 +185,49 @@ def txt_to_matrix(text):
     text = ((",".join(text.split(' '))).replace(',,', ', ').replace(',', ', '))
     #matrix = ast.literal_eval(text)
     return text
+
+def calc_dist(transtion_NN, statesq,prob):
+    classes = ['coffe','tea','peanut','cheese','pealate','cofhoney','hotdog']
+    for i in range(classes):
+        print(classes[i], " :")
+        KL_1 = MSEDistance(S1_Peanut_C1_transtion, transtion_NN[i], statesq[i], prob)
+        KL_2 = MSEDistance(S2_Peanut_C1_transtion, transtion_NN, statesq, prob)
+        KL_3 = MSEDistance(S4_Cheese_C1_transtion, transtion_NN, statesq, prob)
+        KL_4 = MSEDistance(S1_Cheese_C1_transtion, transtion_NN, statesq, prob)
+        KL_5 = MSEDistance(S4_Pealate_C1_transtion, transtion_NN, statesq, prob)
+        KL_6 = MSEDistance(S1_Pealate_C1_transtion, transtion_NN, statesq, prob)
+        KL_7 = MSEDistance(S1_CofHoney_C1_transtion, transtion_NN, statesq, prob)
+        KL_8 = MSEDistance(S2_CofHoney_C1_transtion, transtion_NN, statesq, prob)
+        KL_9 = MSEDistance(S2_Hotdog_C1_transtion, transtion_NN, statesq, prob)
+        KL_10 = MSEDistance(S1_Hotdog_C1_transtion, transtion_NN, statesq, prob)
+        KL_11 = MSEDistance(S2_Tea_C1_transtion, transtion_NN, statesq, prob)
+        KL_12 = MSEDistance(S3_Tea_C1_transtion, transtion_NN, statesq, prob)
+        KL_13= MSEDistance(S1_Coffee_C1_transtion, transtion_NN, statesq, prob)
+        KL_14= MSEDistance(S4_Coffee_C1_transtion, transtion_NN, statesq, prob)
+        video_names ={'peanut':KL_1,'peanut':KL_2,'cheese':KL_3,'cheese':KL_4,'pealate':KL_5,'pealate':KL_6,'cofhoney':KL_7,'cofhoney':KL_8,'hotdog':KL_9,'hotdog':KL_10,'tea':KL_11,'tea':KL_12,'coffe':KL_13,'coffe':KL_14}
+
+        distances1 = [KL_1,KL_2,KL_3,KL_4,KL_5,KL_6,KL_7,KL_8,KL_9,KL_10,KL_11,KL_12,KL_13,KL_14]
+        min_dist = min(video_names, key=video_names.get)
+        print('minimum distance - ', min_dist, ' : ', min(distances1))
+    return
+
+
+def main():
+    gt = [S1_Peanut_C1_transtion, S2_Peanut_C1_transtion, S4_Cheese_C1_transtion, S1_Cheese_C1_transtion, S4_Pealate_C1_transtion, S1_Pealate_C1_transtion, S1_CofHoney_C1_transtion, S2_CofHoney_C1_transtion, S2_Hotdog_C1_transtion, S1_Hotdog_C1_transtion, S2_Tea_C1_transtion, S3_Tea_C1_transtion, S1_Coffee_C1_transtion, S4_Coffee_C1_transtion]
+    softmax = [[observation1, observation2], [observ3, obser4], [obser5, obser6], [obser7, obser8], [obser9, obser10], [obser11, obser12], [obser13, obser14]]
+    
+    # filter softmax matrices. comment this loop to run on original softmax
+    for count,x in enumerate(softmax):
+        softmax[count][0] = filterSoftmax(x[0])
+        softmax[count][1] = filterSoftmax(x[1])
+    
+    for count,x in enumerate(softmax):
+        transtion_NN[count] = create_matrix(x[0])
+        transtion_NN2[count] = create_matrix(x[1])
+        #probality to each state
+        statesq[count] = probabilityState(transtion_NN[count])
+        statesq2[count] = probabilityState(transtion_NN2[count])
+    
+    # False = comparing 2 matrices cell-to-cell. True = comparing eigenvectors.
+    calc_dist(transtion_NN, statesq, True)
+    calc_dist(transtion_NN2, statesq2, True)
